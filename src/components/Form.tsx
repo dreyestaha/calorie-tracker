@@ -1,12 +1,24 @@
-import { useState } from "react"
+import {useState } from "react"
 import { categories } from "../data/categories"
 
+import type { Activity } from "../types"
+
 export default function Form() {
-  const {activity, setActivity} = useState({
-    category: "",
+  const [activity, setActivity] = useState<Activity>({
+    category: 1,
     name: "",
     calories: 0
   })
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>)=>{
+    const isNumberType = ["category","calories"].includes(e.target.id)
+    setActivity(
+      {
+        ...activity,
+        [e.target.id]: isNumberType ? +e.target.value : e.target.value
+      }
+    )
+  }
 
   return (
     <section className="bg-cyan-700 w-auto p-5 flex justify-center">
@@ -17,7 +29,9 @@ export default function Form() {
               name="category" 
               className="p-1 w-full text-center" 
               id="category"
-              value={activity.category}>
+              value={activity.category}
+              onChange={handleChange}
+              >
               {categories.map(category =>(
                 <option value={category.id} key={category.id}>
                   {category.name}
@@ -34,6 +48,7 @@ export default function Form() {
               className="w-full"
               placeholder="Ingresa tu actividad o comida..."
               value={activity.name}
+              onChange={handleChange}
               />
           </div>
 
@@ -45,6 +60,7 @@ export default function Form() {
               className="w-full"
               placeholder="Calorías de la comida o actividad"
               value={activity.calories}
+              onChange={handleChange}
               />
           </div>
           <div className="flex">
@@ -52,6 +68,7 @@ export default function Form() {
               type="submit" 
               className="w-full bg-slate-500 text-white font-semibold hover:bg-green-400 hover:text-black rounded-md py-2 m-1"
               value="Agregar"
+              onChange={handleChange}
             />
           </div>
         </form>
