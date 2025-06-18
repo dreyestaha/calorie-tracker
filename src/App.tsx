@@ -1,7 +1,10 @@
 import Form from "./components/Form"
+import { useReducer } from "react"
+import { activityReducer, initialState } from "./reducers/activityReducer"
 
 function App() {
-  
+  const [state, dispatch] = useReducer(activityReducer,initialState)
+
   return (
     <>
       <header className=" bg-amber-600 flex justify-between">
@@ -9,7 +12,9 @@ function App() {
         <button className="bg-gray-200 hover:bg-green-500 hover:text-white text-mg text-black font-semibold  px-5 py-2 m-5 rounded-sm">Reiniciar contador</button>
       </header>
       
-      <Form/>
+      <Form
+        dispatch ={dispatch}
+      />
 
     </>
   )

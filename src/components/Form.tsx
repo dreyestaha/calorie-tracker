@@ -1,9 +1,14 @@
-import {useState } from "react"
+import {useState, type Dispatch } from "react"
 import { categories } from "../data/categories"
 
 import type { Activity } from "../types"
+import type { ActivityActions } from "../reducers/activityReducer"
 
-export default function Form() {
+type FormProps = {
+  dispatch: Dispatch<ActivityActions>
+}
+
+export default function Form({dispatch} : FormProps) {
   const [activity, setActivity] = useState<Activity>({
     category: 1,
     name: "",
@@ -20,9 +25,23 @@ export default function Form() {
     )
   }
 
+  const isValid = ()=>{
+    const {name, calories} = activity
+    return (name.trim() !== "" && calories>0)
+  }
+
+  const handleSubmit= (e : React.FormEvent<HTMLFormElement>)=>{
+    e.preventDefault()
+
+    dispatch({type:"save-activity", payload: {newActivity : activity}})
+  }
+
   return (
     <section className="bg-cyan-700 w-auto p-5 flex justify-center">
-        <form className=" bg-gray-50 p-3 m-2 rounded-lg w-xl justify-center">
+        <form 
+          className=" bg-gray-50 p-3 m-2 rounded-lg w-xl justify-center"
+          onSubmit={handleSubmit}
+          >
           <div className=" p-2 m-1 border-slate-200 border-2 rounded-md flex justify-between ">
             <label htmlFor="category" className="font-medium p-1" >Categoría</label>
             <select 
@@ -66,9 +85,10 @@ export default function Form() {
           <div className="flex">
             <input 
               type="submit" 
-              className="w-full bg-slate-500 text-white font-semibold hover:bg-green-400 hover:text-black rounded-md py-2 m-1"
-              value="Agregar"
+              className="w-full bg-green-400 text-black font-semibold disabled:opacity-10 rounded-md py-2 m-1"
+              value={activity.category === 1 ? "Guardar Comida" : "Guardar Ejercicio"}
               onChange={handleChange}
+              disabled={!isValid()}
             />
           </div>
         </form>
