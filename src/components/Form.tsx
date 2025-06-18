@@ -1,4 +1,5 @@
 import {useState, type Dispatch } from "react"
+import  {v4 as uuidv4 } from "uuid"
 import { categories } from "../data/categories"
 
 import type { Activity } from "../types"
@@ -8,12 +9,15 @@ type FormProps = {
   dispatch: Dispatch<ActivityActions>
 }
 
-export default function Form({dispatch} : FormProps) {
-  const [activity, setActivity] = useState<Activity>({
+const initialActivityState : Activity ={
+    id: uuidv4(),
     category: 1,
     name: "",
     calories: 0
-  })
+  } 
+
+export default function Form({dispatch} : FormProps) {
+  const [activity, setActivity] = useState<Activity>(initialActivityState)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>)=>{
     const isNumberType = ["category","calories"].includes(e.target.id)
@@ -34,6 +38,10 @@ export default function Form({dispatch} : FormProps) {
     e.preventDefault()
 
     dispatch({type:"save-activity", payload: {newActivity : activity}})
+    setActivity({
+      ...initialActivityState,
+      id: uuidv4()
+    })
   }
 
   return (
