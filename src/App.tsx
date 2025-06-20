@@ -17,7 +17,7 @@ function App() {
           dispatch ={dispatch}
         />
       </section>
-      <section className="wx-auto bg-cyan-700 justify-center">
+      <section className="wx-auto bg-cyan-700 justify-center ">
         <ActivityList
           activities= {state.activities}
         />
