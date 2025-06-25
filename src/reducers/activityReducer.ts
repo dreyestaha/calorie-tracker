@@ -1,41 +1,73 @@
-// Importamos el tipo Activity, que define la estructura de una actividad
 import type { Activity } from "../types"
 
-// Definimos los tipos posibles de acciones que puede manejar el reducer.
-// En este caso, solo hay una: "save-activity", que trae un nuevo objeto Activity en su payload.
 export type ActivityActions = 
-    {type:"save-activity", payload: {newActivity: Activity} } 
+{type:"save-activity", payload: {newActivity: Activity} } |
+{type:"set-activeId", payload: {id: Activity["id"]} } |
+{type:"delete-activity", payload: {id: Activity["id"]} } |
+{type:"restart-app"} //como reinicia todo, no es necesario que reciba un payload
 
-// Definimos cómo luce el estado que maneja este reducer: tiene un arreglo de actividades.
-type ActivityState = {
-    activities: Activity[]
+export type ActivityState = {
+    activities: Activity[],
+    activeId: Activity["id"]
 }
 
-// Estado inicial: un objeto con una propiedad `activities` que comienza como un arreglo vacío.
+const localStorageActivities = ()=>{
+    const activities = localStorage.getItem("activities")
+    return activities ? JSON.parse(activities) : []
+}
+
 export const initialState : ActivityState = {
-    activities: []
+    activities: localStorageActivities(),
+    activeId: ""
 }
 
-// Esta es la función reducer. 
-// Recibe dos cosas: el estado actual (`state`) y una acción (`actions`).
-// Si no se pasa un estado, se usará `initialState` como valor por defecto.
 export const activityReducer = (
     state : ActivityState = initialState,
     actions : ActivityActions
     ) => {
 
-    // Comprobamos qué tipo de acción se recibió.
     if(actions.type === "save-activity"){
-        // Si la acción es "save-activity", devolvemos un nuevo estado:
+        let updatedActivity: Activity[] = []
+        
+        if(state.activeId){
+            updatedActivity = state.activities.map(activity=>
+                (activity.id === state.activeId ? actions.payload.newActivity : activity)
+            )
+        }
+        else{
+            updatedActivity = [...state.activities, actions.payload.newActivity]
+        }
 
         return {
-            // Copiamos el estado anterior (por si hay más propiedades)
             ...state,
-            // Actualizamos la lista de actividades, agregando la nueva actividad al final
-            activities: [...state.activities, actions.payload.newActivity]
+            activities: updatedActivity,
+            activeId: ""
         }
     }
 
-    // Si la acción no es reconocida, devolvemos el estado sin cambios
+    if(actions.type === "set-activeId"){
+
+        return{
+            ...state,
+            activeId: actions.payload.id
+        }
+    }
+
+    if(actions.type === "delete-activity"){
+
+        return{
+            ...state,
+            //aqui retornamos todas las actividades que no coinciden con el id seleccionado
+            activities: state.activities.filter(activity => activity.id !== actions.payload.id)
+        }
+    }
+    if(actions.type === "restart-app"){
+
+        return{
+            activities: [],
+            activeId: ""   
+        }
+    }
+
     return state
 }
